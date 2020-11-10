@@ -1,0 +1,5 @@
+## This is untested!
+## Inspiration:
+## - https://www.tecmint.com/configure-ldap-client-to-connect-external-authentication/
+- name: Configure LDAP AuthN
+  shell: authconfig --enableldap --enableldapauth --ldapserver={{ ldap_auth_config_ldapns_ldap_server }} --ldapbasedn="{{ ldap_auth_config_ldapns_base_dn }}" --enablemkhomedir --update

@@ -1,0 +1,22 @@
+---
+- name: Update APT package cache
+  shell: apt update -y
+  tags: always
+
+- name: Preconfigure package parameters for silent install
+  shell: |
+    echo "{{ item }}" | debconf-set-selections
+  loop:
+  - ldap-auth-config ldap-auth-config/ldapns/ldap_version select   {{ ldap_auth_config_ldapns_ldap_version | d('3') }}
+  - ldap-auth-config ldap-auth-config/ldapns/ldap-server  string   {{ ldap_auth_config_ldapns_ldap_server }}
+  - ldap-auth-config ldap-auth-config/ldapns/base-dn      string   {{ ldap_auth_config_ldapns_base_dn }}
+  - ldap-auth-config ldap-auth-config/dblogin             boolean  {{ ldap_auth_config_dblogin }}
+  - ldap-auth-config ldap-auth-config/bindpw              password {{ ldap_auth_config_bindpw }}
+  - ldap-auth-config ldap-auth-config/binddn              string   {{ ldap_auth_config_binddn }}
+  - ldap-auth-config ldap-auth-config/dbrootlogin         boolean  {{ ldap_auth_config_dbrootlogin }}
+  - ldap-auth-config ldap-auth-config/rootbinddn          string   {{ ldap_auth_config_rootbinddn }}
+  - ldap-auth-config ldap-auth-config/rootbindpw          password {{ ldap_auth_config_rootbindpw }}
+  - ldap-auth-config ldap-auth-config/pam_password        select   {{ ldap_auth_config_pam_password }}
+  - ldap-auth-config ldap-auth-config/override            boolean  true
+  - ldap-auth-config ldap-auth-config/move-to-debconf     boolean  true
+  tags: always

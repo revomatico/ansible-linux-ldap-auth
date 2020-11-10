@@ -1,0 +1,20 @@
+ldap_auth_config_ldapns_base_dn: 'dc=mydomain,dc=com'
+
+## Use root login?
+ldap_auth_config_dbrootlogin: true
+## If yes, what user?
+ldap_auth_config_rootbinddn: "uid=superuser,o=MyOrg,{{ ldap_auth_config_ldapns_base_dn }}"
+## If yes, what password?
+#ldap_auth_config_rootbindpw: 'hackme'
+
+ldap_conf:
+- match: '^pam_filter\s.*'
+  replace: 'pam_filter objectclass=posixAccount'
+- match: '^nss_base_passwd\s.*'
+  replace: "nss_base_passwd ou=Users,o=MyOrg,{{ ldap_auth_config_ldapns_base_dn }}?sub"
+- match: '^nss_base_shadow\s.*'
+  replace: "nss_base_shadow ou=Users,o=MyOrg,{{ ldap_auth_config_ldapns_base_dn }}?sub"
+- match: '^nss_base_group\s.*'
+  replace: "nss_base_group ou=Groups,o=MyOrg,{{ ldap_auth_config_ldapns_base_dn }}?sub"
+- match: '^nss_schema\s.*'
+  replace: 'nss_schema rfc2307bis'

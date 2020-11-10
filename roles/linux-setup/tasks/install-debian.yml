@@ -1,0 +1,5 @@
+- name: "APT: {{ item }}"
+  apt:
+    name: "{{ item }}"
+    state: "{{ os_package_state }}"
+    purge: "{{ os_package_purge }}"

@@ -1,0 +1,46 @@
+ldap_auth_config_ldapns_ldap_server: 'ldap://localhost'
+ldap_auth_config_ldapns_base_dn: 'dc=mydomain,dc=com'
+
+## Does LDAP require authentication itself?
+ldap_auth_config_dblogin: false
+## If it does, what user?
+ldap_auth_config_binddn: "uid=service_account,{{ ldap_auth_config_ldapns_base_dn }}"
+## If it does, what password?
+ldap_auth_config_bindpw: ''
+
+## Use root login?
+ldap_auth_config_dbrootlogin: true
+## If yes, what user?
+ldap_auth_config_rootbinddn: "uid=superuser,o=MyOrg,{{ ldap_auth_config_ldapns_base_dn }}"
+## If yes, what password?
+#ldap_auth_config_rootbindpw: ''
+
+## Password hasing algorythm. Possible values: md5, sha, des (Default)
+ldap_auth_config_pam_password: sha
+
+## Entries to change in /etc/ldap.conf
+ldap_conf: []
+
+os_packages:
+  Debian:
+    all:
+    - debconf-utils
+    - libnss-ldap
+    - libpam-ldap
+    - ldap-utils
+    - nscd
+## Can use distro release specific packages
+#    '16':
+#    - mypackage
+#    '18':
+#    - mypackage18
+#    '20':
+## Untested yet!
+  RedHat:
+    all:
+    - openldap-clients
+    - nss-pam-ldapd
+#    '7':
+
+os_package_state: present
+os_package_purge: no

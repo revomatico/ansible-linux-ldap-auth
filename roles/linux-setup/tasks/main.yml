@@ -1,0 +1,49 @@
+- include_tasks: "pre-{{ ansible_facts.os_family | lower }}.yml"
+  tags: install_packages
+
+- name: Install software packages
+  vars:
+    os_packages_list: "{{ os_packages[ansible_facts.os_family].all | default([]) + os_packages[ansible_facts.os_family][ansible_lsb.major_release] | default([]) }}"
+  include_tasks: "install-{{ ansible_facts.os_family | lower }}.yml"
+  loop: "{{ os_packages_list }}"
+  ignore_errors: true
+  tags: install_packages
+
+- meta: end_play
+  when: os_package_state == 'absent'
+
+- name: Change /etc/nsswitch.conf
+  replace:
+    path: /etc/nsswitch.conf
+    regexp: '^(passwd|group|shadow):((?!.+ldap).*)'
+    replace: '\1:\2 ldap'
+    backup: yes
+
+- name: Change /etc/pam.d/common-password
+  lineinfile:
+    path: /etc/pam.d/common-password
+    regexp: '(password\s+\[.+)use_authtok(.+)'
+    line: '\1\2'
+    backrefs: yes
+    backup: yes
+
+- name: Change /etc/pam.d/common-session
+  lineinfile:
+    path: /etc/pam.d/common-session
+    regexp: '^.+pam_mkhomedir\.so.+$'
+    line: 'session optional pam_mkhomedir.so skel=/etc/skel umask=077'
+    backup: yes
+
+- name: Change /etc/ldap.conf
+  lineinfile:
+    path: /etc/ldap.conf
+    regexp: "{{ item.match }}"
+    line: "{{ item.replace }}"
+#    backrefs: yes
+    backup: yes
+  loop: "{{ ldap_conf }}"
+
+- name: Restart nscd service
+  service:
+    name: nscd
+    state: restarted
