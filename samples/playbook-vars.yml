@@ -8,8 +8,9 @@ ldap_auth_config_rootbinddn: "uid=superuser,o=MyOrg,{{ ldap_auth_config_ldapns_b
 #ldap_auth_config_rootbindpw: 'hackme'
 
 ldap_conf:
+## Only allow members of a certain grup to login
 - match: '^pam_filter\s.*'
-  replace: 'pam_filter objectclass=posixAccount'
+  replace: 'pam_filter &(objectclass=posixAccount)(memberof=cn=sudo,ou=Groups,ou=MyOrg,{{ ldap_auth_config_ldapns_base_dn }})'
 - match: '^nss_base_passwd\s.*'
   replace: "nss_base_passwd ou=Users,o=MyOrg,{{ ldap_auth_config_ldapns_base_dn }}?sub"
 - match: '^nss_base_shadow\s.*'
@@ -18,3 +19,5 @@ ldap_conf:
   replace: "nss_base_group ou=Groups,o=MyOrg,{{ ldap_auth_config_ldapns_base_dn }}?sub"
 - match: '^nss_schema\s.*'
   replace: 'nss_schema rfc2307bis'
+- match: '^pam_member_attribute\s.*'
+  replace: 'pam_member_attribute member'

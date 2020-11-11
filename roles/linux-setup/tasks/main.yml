@@ -19,6 +19,14 @@
     replace: '\1:\2 ldap'
     backup: yes
 
+- name: Change /etc/pam.d/common-account
+  lineinfile:
+    path: /etc/pam.d/common-account
+    regexp: '(account\s+)\[.+(ldap.+)'
+    line: '\1sufficient \2'
+    backrefs: yes
+    backup: yes
+
 - name: Change /etc/pam.d/common-password
   lineinfile:
     path: /etc/pam.d/common-password
